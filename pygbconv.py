@@ -2,6 +2,12 @@ import sys
 from PIL import Image
 from collections import defaultdict
 from math import floor, ceil, log
+import os
+
+# Images are loaded from this directory.
+# Output is saved to 'slideshow.gb' in this directory.
+IMG_DIR = os.path.join('C:', 'User', 'Andrew', 'GameBoyFun', 'Slideshows', 'Family') # Windows
+#IMG_DIR = os.path.join('/', 'home', 'Andrew') # Mac
 
 MAX_SUPPORTED_IMAGES = 256
 
@@ -216,19 +222,10 @@ def compilerom(gbin, gbout, images):
 	fout.close()
 
 def main():
-	if len(sys.argv) < 3:
-		# Too few: usage and exit.
-		print "Usage: ./pygbconv.py output.gb image0.png image1.png ..."
-		print "Outputs image slideshow ROM to (output.gb), for <= 256 images."
-		print "Actual number of colors in each image must be four or less. Color depth can be anything that PIL can interpret."
-		print "Do not use a file format that would destroy 4 color images, such as JPEG. PNG, GIF and BMP (with any color depth) are ey-ok."
-		return 0
-	elif 2 + MAX_SUPPORTED_IMAGES < len(sys.argv):
-		# Too many: invalid
-		print "Please keep it under {} images!" % (MAX_SUPPORTED_IMAGES)
-		return 1
-
-	compilerom("imagerom.gbbase", sys.argv[1], sys.argv[2:])
+	namesInInputDir = [os.path.join(IMG_DIR, f) for f in os.listdir(IMG_DIR)]
+	realFiles = [f for f in namesInInputDir if not os.path.isdir(f) and not f.endswith('.gb')]
+	slideshowName = os.path.join(IMG_DIR, 'slideshow.gb')
+	compilerom("imagerom.gbbase", slideshowName, realFiles)
 	return 0
 
 if __name__ == "__main__":
